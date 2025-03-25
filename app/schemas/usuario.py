@@ -1,11 +1,13 @@
 # Arquivo para validar os dados recebidos apenas.
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, field_validator, ConfigDict
 from sqlalchemy import Enum
 
 class UsuarioBase(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     email: EmailStr
-    tipo: Enum
+    tipo: str
 
 
 class UsuarioLogin(UsuarioBase):

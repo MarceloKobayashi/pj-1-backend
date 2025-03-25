@@ -5,3 +5,5 @@ passlib
 mysql-connector-python
 python-dotenv
 sqlalchemy
+pydantic
+email-validator
