@@ -1,0 +1,96 @@
+DROP SCHEMA amazon;
+
+CREATE SCHEMA amazon;
+
+CREATE TABLE amazon.usuarios (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL, -- hash da senha
+    tipo ENUM('comprador', 'vendedor', 'admin') NOT NULL,
+    telefone VARCHAR(20),
+	data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE amazon.enderecos (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    cep VARCHAR(10) NOT NULL,
+    logradouro VARCHAR(255) NOT NULL,
+    numero VARCHAR(10) NOT NULL,
+    complemento VARCHAR(100),
+    cidade VARCHAR(100) NOT NULL,
+    estado VARCHAR(50) NOT NULL,
+    fk_endereco_usuario_id INT NOT NULL,
+    
+    FOREIGN KEY (fk_endereco_usuario_id) REFERENCES amazon.usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE amazon.categorias (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	nome VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE amazon.produtos (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    preco DECIMAL(10, 2) NOT NULL,
+    qntd_estoque INT NOT NULL,
+    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fk_produtos_vendedor_id INT NOT NULL,
+    fk_produtos_categoria_id INT NOT NULL,
+    
+    FOREIGN KEY (fk_produtos_vendedor_id) REFERENCES amazon.usuarios(id) ON DELETE CASCADE,
+	FOREIGN KEY (fk_produtos_categoria_id) REFERENCES amazon.categorias(id) ON DELETE CASCADE
+);
+
+CREATE TABLE amazon.carrinho_pedido (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    status ENUM('pendente', 'processando', 'finalizado', 'cancelado'),
+    data_adicao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fk_carrinho_usuario_id INT NOT NULL, 
+    
+    FOREIGN KEY (fk_carrinho_usuario_id) REFERENCES amazon.usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE amazon.carrinho_produto (
+	quantidade INT NOT NULL DEFAULT 1,
+	fk_cp_carrinho_id INT NOT NULL,
+    fk_cp_produto_id INT NOT NULL,
+    
+    PRIMARY KEY (fk_cp_carrinho_id, fk_cp_produto_id),
+    FOREIGN KEY (fk_cp_carrinho_id) REFERENCES amazon.carrinho_pedido(id) ON DELETE CASCADE,
+    FOREIGN KEY (fk_cp_produto_id) REFERENCES amazon.produtos(id) ON DELETE CASCADE
+);
+
+CREATE TABLE amazon.pagamentos (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	forma_pagamento ENUM('credito', 'debito', 'pix') NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    status ENUM('pendente', 'pago', 'cancelado') DEFAULT 'pendente',
+    data_pagamento TIMESTAMP NULL,
+    fk_pag_carrinho_id INT NOT NULL,
+    
+    FOREIGN KEY (fk_pag_carrinho_id) REFERENCES amazon.carrinho_pedido(id) ON DELETE CASCADE
+);
+
+CREATE TABLE amazon.avaliacoes (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    nota INT CHECK (nota BETWEEN 1 AND 5),
+    comentario TEXT,
+    data_avaliacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fk_ava_produto_id INT NOT NULL,
+    fk_ava_usuario_id INT NOT NULL,
+    
+    FOREIGN KEY (fk_ava_produto_id) REFERENCES amazon.produtos(id) ON DELETE CASCADE,
+    FOREIGN KEY (fk_ava_usuario_id) REFERENCES amazon.usuarios(id) ON DELETE CASCADE
+);
+
+CREATE TABLE amazon.imagens_produtos (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    url_img VARCHAR(255) NOT NULL,
+    ordem INT DEFAULT 1,
+    fk_imag_produto_id INT NOT NULL,
+    
+    FOREIGN KEY (fk_imag_produto_id) REFERENCES amazon.produtos(id) ON DELETE CASCADE
+);
