@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import TIMESTAMP
-from sqlalchemy.sql.functions import current_timestamp
+from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.schemas.usuario import UsuarioLogin, UsuarioCreate
@@ -11,7 +10,7 @@ from app.database import get_db
 router = APIRouter(prefix="/auth", tags=["Autenticação"])
 
 @router.post("/login", response_model=dict)
-async def login(credenciais, UsuarioLogin, db: Session = Depends(get_db)):
+async def login(credenciais: UsuarioLogin, db: Session = Depends(get_db)):
     usuario = db.query(Usuario).filter(Usuario.email == credenciais.email).first()
 
     if not usuario or not verificar_senha(credenciais.senha, usuario.senha):
@@ -26,7 +25,7 @@ async def login(credenciais, UsuarioLogin, db: Session = Depends(get_db)):
     return {"access_token": token, "token_type": "bearer"}
 
 @router.post("/cadastrar", status_code=status.HTTP_201_CREATED)
-async def cadastrar(usuario, UsuarioCreate, db: Session = Depends(get_db)):
+async def cadastrar(usuario: UsuarioCreate, db: Session = Depends(get_db)):
     if db.query(Usuario).filter(Usuario.email == usuario.email).first():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -39,7 +38,7 @@ async def cadastrar(usuario, UsuarioCreate, db: Session = Depends(get_db)):
         senha=hash_senha(usuario.senha),
         tipo=usuario.tipo,
         telefone=usuario.telefone,
-        data_cadastro=current_timestamp()
+        data_cadastro=datetime.utcnow()
     )
 
     db.add(db_usuario)
