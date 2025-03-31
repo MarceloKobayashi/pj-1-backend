@@ -16,7 +16,8 @@ class UsuarioLogin(UsuarioBase):
 
 class UsuarioCreate(UsuarioLogin):
     nome: str
-
+    telefone: str
+    
     @field_validator('tipo')
     def validar_tipo(cls, v):
         tipos_validos = ['comprador', 'vendedor', 'admin']
