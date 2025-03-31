@@ -7,7 +7,6 @@ class UsuarioBase(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     email: EmailStr
-    tipo: str
 
 
 class UsuarioLogin(UsuarioBase):
@@ -17,6 +16,7 @@ class UsuarioLogin(UsuarioBase):
 class UsuarioCreate(UsuarioLogin):
     nome: str
     telefone: str
+    tipo: str
     
     @field_validator('tipo')
     def validar_tipo(cls, v):
