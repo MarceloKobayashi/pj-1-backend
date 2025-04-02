@@ -38,6 +38,20 @@ async def criar_produto(produto: ProdutoCreate, db: Session = Depends(get_db), c
 
     return db_produto
 
+@router.get("/listar-meus-produtos", response_model=List[ProdutoResponse])
+async def listar_produtos_vendedor(db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+    if current_user.tipo != "vendedor":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Apenas vendedores podem listar seus produtos."
+        )
+    
+    produtos = db.query(Produto)\
+        .filter(Produto.fk_produtos_vendedor_id == current_user.id)\
+        .order_by(Produto.data_cadastro.desc())\
+        .all()
+    
+    return produtos
 
 @router.get("/categorias", response_model=List[CategoriaResponse])
 async def listar_categorias(db: Session = Depends(get_db)):
