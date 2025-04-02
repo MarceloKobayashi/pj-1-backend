@@ -12,8 +12,8 @@ class Produto(Base):
     preco = Column(DECIMAL(10, 2), nullable=False)
     qntd_estoque = Column(Integer, nullable=False)
     data_cadastro = Column(TIMESTAMP, server_default=func.now())
-    vendedor_id = Column(Integer, ForeignKey('usuarios.id'))
-    categoria_id = Column(Integer, ForeignKey('categorias.id'))
+    fk_produtos_vendedor_id = Column(Integer, ForeignKey('usuarios.id'))
+    fk_produtos_categoria_id = Column(Integer, ForeignKey('categorias.id'))
 
     # Relacionamentos
     vendedor = relationship("Usuario", back_populates="produtos")

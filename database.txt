@@ -94,3 +94,11 @@ CREATE TABLE amazon.imagens_produtos (
     
     FOREIGN KEY (fk_imag_produto_id) REFERENCES amazon.produtos(id) ON DELETE CASCADE
 );
+
+INSERT INTO amazon.categorias (nome) VALUES
+	("eletronicos"),
+    ("moda"),
+    ("casa"),
+    ("livros"),
+    ("saude"),
+    ("brinquedos");
