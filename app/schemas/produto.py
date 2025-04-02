@@ -2,7 +2,12 @@
 
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
+
+class ImagemProdutoBase(BaseModel):
+    url_img: str
+    ordem: Optional[int] = 1
+
 
 class ProdutoBase(BaseModel):
     nome: str
@@ -10,6 +15,7 @@ class ProdutoBase(BaseModel):
     preco: float
     qntd_estoque: int
     fk_produtos_categoria_id: int
+    imagens: Optional[List[ImagemProdutoBase]] = None
 
 
 class ProdutoCreate(ProdutoBase):

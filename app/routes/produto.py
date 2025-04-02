@@ -7,6 +7,7 @@ from app.schemas.categoria import CategoriaResponse
 from app.models.produto import Produto
 from app.models.usuario import Usuario
 from app.models.categoria import Categoria
+from app.models.imagem_produto import ImagemProduto
 from app.database import get_db
 from app.core.current_user import get_current_user
 
@@ -27,14 +28,26 @@ async def criar_produto(produto: ProdutoCreate, db: Session = Depends(get_db), c
             detail="Categoria não encontrada."
         )
     
+    produto_data = produto.model_dump(exclude={"imagens"})
     db_produto = Produto(
-        **produto.model_dump(),
+        **produto_data,
         fk_produtos_vendedor_id=current_user.id
     )
 
     db.add(db_produto)
     db.commit()
     db.refresh(db_produto)
+
+    if produto.imagens:
+        for img in produto.imagens:
+            db_imagem = ImagemProduto(
+                url_img=img.url_img,
+                ordem=img.ordem,
+                fk_imag_produto_id=db_produto.id
+            )
+            db.add(db_imagem)
+        db.commit()
+        db.refresh(db_produto)
 
     return db_produto
 
