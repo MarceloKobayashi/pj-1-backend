@@ -22,6 +22,10 @@ class ProdutoCreate(ProdutoBase):
     pass
 
 
+class ProdutoUpdate(ProdutoBase):
+    pass
+
+
 class ProdutoResponse(ProdutoBase):
     id: int
     data_cadastro: datetime

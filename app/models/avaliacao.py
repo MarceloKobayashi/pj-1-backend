@@ -11,8 +11,8 @@ class Avaliacao(Base):
     nota = Column(Integer, nullable=False)
     comentario = Column(Text)
     data_avaliacao = Column(TIMESTAMP, server_default=func.now())
-    produto_id = Column(Integer, ForeignKey('produtos.id'))
-    usuario_id = Column(Integer, ForeignKey('usuarios.id'))
+    fk_ava_produto_id = Column(Integer, ForeignKey('produtos.id'))
+    fk_ava_usuario_id = Column(Integer, ForeignKey('usuarios.id'))
 
     produto = relationship("Produto", back_populates="avaliacoes")
     usuario = relationship("Usuario", back_populates="avaliacoes")

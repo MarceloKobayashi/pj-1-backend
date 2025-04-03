@@ -11,9 +11,7 @@ class Pagamento(Base):
     valor = Column(DECIMAL(10, 2), nullable=False)
     status = Column(Enum('pendente', 'pago', 'cancelado', name='status_pagamento'), default='pendente')
     data_pagamento = Column(TIMESTAMP)
-    carrinho_id = Column(Integer, ForeignKey('carrinho_pedido.id'))
-    usuario_id = Column(Integer, ForeignKey('usuarios.id'))
+    fk_pag_carrinho_id = Column(Integer, ForeignKey('carrinho_pedido.id'))
 
     carrinho = relationship("CarrinhoPedido", back_populates="pagamento")
-    usuario = relationship("Usuario", back_populates="pagamentos")
 

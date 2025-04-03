@@ -18,6 +18,5 @@ class Usuario(Base):
     enderecos = relationship("Endereco", back_populates="usuario", cascade="all, delete-orphan")
     produtos = relationship("Produto", back_populates="vendedor")
     carrinhos = relationship("CarrinhoPedido", back_populates="usuario")
-    pagamentos = relationship("Pagamento", back_populates="usuario")
     avaliacoes = relationship("Avaliacao", back_populates="usuario")
     
