@@ -36,8 +36,6 @@ class ProdutoResponse(ProdutoBase):
 
 class ProdutoVendedorResponse(ProdutoBase):
     id: int
-    data_cadastro: datetime
-    fk_produtos_vendedor_id: int
     vendedor_nome: str
 
     model_config = ConfigDict(from_attributes=True)
