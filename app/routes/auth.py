@@ -20,7 +20,7 @@ async def login(credenciais: UsuarioLogin, db: Session = Depends(get_db)):
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    token = criar_token_jwt({"sub": usuario.email, "tipo": usuario.tipo})
+    token = criar_token_jwt({"sub": usuario.email, "tipo": usuario.tipo, "nome": usuario.nome})
 
     return {"access_token": token, "token_type": "bearer"}
 
