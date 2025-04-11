@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import index, auth, produto, endereco
+from app.routes import index, auth, produto, endereco, carrinho
 from app.database import engine, Base
 
 app = FastAPI(
@@ -24,7 +24,7 @@ app.include_router(index.router)
 app.include_router(auth.router)
 app.include_router(produto.router)
 app.include_router(endereco.router)
-
+app.include_router(carrinho.router)
 
 @app.get("/")
 def home():

@@ -9,7 +9,7 @@ from app.database import get_db
 
 router = APIRouter(prefix="/enderecos", tags=["Endereços"])
 
-@router.post("/cadatrar", response_model=EnderecoResponse)
+@router.post("/cadastrar", response_model=EnderecoResponse)
 async def criar_endereco(endereco: EnderecoCreate, db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
     if current_user.tipo != "comprador":
         raise HTTPException(
