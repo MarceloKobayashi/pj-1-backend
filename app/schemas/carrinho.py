@@ -6,6 +6,10 @@ class ItemCarrinhoCreate(BaseModel):
     quantidade: int = 1
 
 
+class ItemCarrinhoRemove(BaseModel):
+    produto_id: int
+
+
 class ItemCarrinhoResponse(BaseModel):
     id: int
     produto_id: int
@@ -13,6 +17,7 @@ class ItemCarrinhoResponse(BaseModel):
     produto_preco: float
     quantidade: int
     subtotal: float
+    imagem_url: Optional[str] = None
 
 
 class CarrinhoResponse(BaseModel):
