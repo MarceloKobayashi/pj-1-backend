@@ -48,7 +48,7 @@ async def adicionar_item_carrinho(item: ItemCarrinhoCreate, db: Session = Depend
     ).first()
 
     if item_existente:
-        item_existente.quantidade += item.quantidade
+        item_existente.quantidade = item.quantidade
     else:
         novo_item = CarrinhoProduto(
             fk_cp_carrinho_id=carrinho.id,
@@ -267,4 +267,3 @@ async def desfazer_remocao(item: ItemCarrinhoRemove, db: Session = Depends(get_d
     del removed_itens_cache[cache_key]
 
     return {"message": "Remoção desfeita com sucesso."}
-
