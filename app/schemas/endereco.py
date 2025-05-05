@@ -13,6 +13,10 @@ class EnderecoCreate(EnderecoBase):
     pass
 
 
+class EnderecoUpdate(EnderecoBase):
+    pass
+
+
 class EnderecoResponse(EnderecoBase):
     id: int
     fk_endereco_usuario_id: int
