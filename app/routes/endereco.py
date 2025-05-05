@@ -48,7 +48,7 @@ async def deletar_endereco(endereco_id: int, db: Session = Depends(get_db), curr
 
     return None
 
-@router.put("editar/{endereco_id}", response_model=EnderecoResponse)
+@router.put("/editar/{endereco_id}", response_model=EnderecoResponse)
 async def editar_endereco(endereco_id: int, endereco_data: EnderecoUpdate, db: Session = Depends(get_db), current_user: Session = Depends(get_current_user)):
     endereco = db.query(Endereco).filter(Endereco.id == endereco_id, Endereco.fk_endereco_usuario_id == current_user.id).first()
     if not endereco:
