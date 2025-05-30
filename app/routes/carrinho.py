@@ -267,3 +267,88 @@ async def desfazer_remocao(item: ItemCarrinhoRemove, db: Session = Depends(get_d
     del removed_itens_cache[cache_key]
 
     return {"message": "Remoção desfeita com sucesso."}
+
+# Rota para finalizar
+@router.put("/finalizar")
+async def finalizar_compra(db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+    carrinho = db.query(CarrinhoPedido).filter(
+        CarrinhoPedido.fk_carrinho_usuario_id == current_user.id,
+        CarrinhoPedido.status == "pendente"
+    ).first()
+
+    if not carrinho:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Nenhum carrinho pendente encontrado."
+        )
+    
+    itens_carrinho = db.query(CarrinhoProduto).filter(CarrinhoProduto.fk_cp_carrinho_id == carrinho.id).all()
+    if not itens_carrinho:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="O carrinho está vazio."
+        )
+    
+    for item in itens_carrinho:
+        produto = db.query(Produto).filter(Produto.id == item.fk_cp_produto_id).first()
+        if produto.qntd_estoque < item.quantidade:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Estoque insuficiente para o produto {produto.name}. Disponível: {produto.qntd_estoque}"
+            )
+
+    carrinho.status = "finalizado"
+    db.commit()
+
+    for item in itens_carrinho:
+        produto = db.query(Produto).filter(Produto.id == item.fk_cp_produto_id).first()
+        produto.qntd_estoque -= item.quantidade
+        db.commit()
+    
+    return {"detail": "Compra finalizada com sucesso."}
+
+@router.get("/pedidos", response_model=list[CarrinhoResponse])
+async def listar_pedidos_finalizados(db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+    pedidos = db.query(CarrinhoPedido).filter(
+        CarrinhoPedido.fk_carrinho_usuario_id == current_user.id,
+        CarrinhoPedido.status == "finalizado"
+    ).order_by(CarrinhoPedido.data_adicao.desc()).all()
+
+    resposta = []
+
+    for pedido in pedidos:
+        itens_carrinho = db.query(CarrinhoProduto).filter(
+            CarrinhoProduto.fk_cp_carrinho_id == pedido.id
+        ).all()
+
+        itens_response = []
+        total = 0.0
+
+        for item in itens_carrinho:
+            produto = db.query(Produto).filter(Produto.id == item.fk_cp_produto_id).first()
+            imagem = db.query(ImagemProduto).filter(
+                ImagemProduto.fk_imag_produto_id == item.fk_cp_produto_id,
+                ImagemProduto.ordem == 1
+            ).first()
+
+            subtotal = round(float(produto.preco) * item.quantidade, 2)
+            total += subtotal
+
+            itens_response.append(ItemCarrinhoResponse(
+                id=item.fk_cp_produto_id,
+                produto_id=item.fk_cp_produto_id,
+                produto_nome=produto.nome,
+                produto_preco=float(produto.preco),
+                quantidade=item.quantidade,
+                subtotal=subtotal,
+                imagem_url=imagem.url_img if imagem else None
+            ))
+        
+        resposta.append(CarrinhoResponse(
+            id=pedido.id,
+            itens=itens_response,
+            total=round(total, 2),
+            status=pedido.status
+        ))
+
+    return resposta

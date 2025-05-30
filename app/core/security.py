@@ -11,7 +11,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "chave-secreta-padrao")    # chave para assinar
 ALGORITHM = "HS256"     # algoritmo de criptografia
-ACCESS_TOKEN_EXPIRE_MINUTES = 30    # tempo de vida do token
+ACCESS_TOKEN_EXPIRE_MINUTES = 120    # tempo de vida do token
 
 # Contexto para a hash
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
