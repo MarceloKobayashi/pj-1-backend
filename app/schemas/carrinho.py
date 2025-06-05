@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 class ItemCarrinhoCreate(BaseModel):
     produto_id: int
@@ -26,3 +27,9 @@ class CarrinhoResponse(BaseModel):
     total: float
     status: str
 
+class CarrinhoPedidoResponse(BaseModel):
+    id: int
+    itens: list[ItemCarrinhoResponse]
+    total: float
+    status: str
+    data_adicao: datetime

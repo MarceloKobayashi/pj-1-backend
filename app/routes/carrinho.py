@@ -4,7 +4,7 @@ from sqlalchemy import and_
 from datetime import datetime, timedelta
 
 from app.models import CarrinhoPedido, CarrinhoProduto, Produto, Usuario, ImagemProduto
-from app.schemas.carrinho import ItemCarrinhoCreate, CarrinhoResponse, ItemCarrinhoResponse, ItemCarrinhoRemove
+from app.schemas.carrinho import ItemCarrinhoCreate, CarrinhoResponse, ItemCarrinhoResponse, ItemCarrinhoRemove, CarrinhoPedidoResponse
 from app.database import get_db
 from app.core.current_user import get_current_user
 
@@ -307,7 +307,7 @@ async def finalizar_compra(db: Session = Depends(get_db), current_user: Usuario 
     
     return {"detail": "Compra finalizada com sucesso."}
 
-@router.get("/pedidos", response_model=list[CarrinhoResponse])
+@router.get("/pedidos", response_model=list[CarrinhoPedidoResponse])
 async def listar_pedidos_finalizados(db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
     pedidos = db.query(CarrinhoPedido).filter(
         CarrinhoPedido.fk_carrinho_usuario_id == current_user.id,
@@ -326,6 +326,9 @@ async def listar_pedidos_finalizados(db: Session = Depends(get_db), current_user
 
         for item in itens_carrinho:
             produto = db.query(Produto).filter(Produto.id == item.fk_cp_produto_id).first()
+            if not produto:
+                continue
+            
             imagem = db.query(ImagemProduto).filter(
                 ImagemProduto.fk_imag_produto_id == item.fk_cp_produto_id,
                 ImagemProduto.ordem == 1
@@ -344,11 +347,12 @@ async def listar_pedidos_finalizados(db: Session = Depends(get_db), current_user
                 imagem_url=imagem.url_img if imagem else None
             ))
         
-        resposta.append(CarrinhoResponse(
+        resposta.append(CarrinhoPedidoResponse(
             id=pedido.id,
             itens=itens_response,
             total=round(total, 2),
-            status=pedido.status
+            status=pedido.status,
+            data_adicao=pedido.data_adicao
         ))
 
     return resposta
